@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package invest.analytics.v1;
+
+option java_multiple_files = true;
+option java_package = "invest.analytics.v1";
+
+service AnalyticsService {
+  rpc GetPerformance(GetPerformanceRequest) returns (PortfolioPerformanceResponse);
+  rpc GenerateReport(GenerateReportRequest) returns (ReportResponse);
+  rpc ListReports(ListReportsRequest) returns (ListReportsResponse);
+  rpc GetReport(GetReportRequest) returns (ReportResponse);
+  rpc GetPlatformStats(GetPlatformStatsRequest) returns (PlatformStatsResponse);
+}
+
+enum ReportType {
+  REPORT_TYPE_UNSPECIFIED = 0;
+  ON_DEMAND = 1;
+  SCHEDULED = 2;
+}
+
+message GetPerformanceRequest {
+  string portfolio_id = 1;
+  string period_start = 2;
+  string period_end = 3;
+}
+
+message PortfolioPerformanceResponse {
+  string portfolio_id = 1;
+  string period_start = 2;
+  string period_end = 3;
+  string currency = 4;
+  string start_value = 5;
+  string end_value = 6;
+  string purchases_amount = 7;
+  string sales_amount = 8;
+  string profit = 9;
+  string yield_percent = 10;
+}
+
+message GenerateReportRequest {
+  string portfolio_id = 1;
+  string period_start = 2;
+  string period_end = 3;
+  ReportType type = 4;
+}
+
+message CategoryShareResponse {
+  string category = 1;
+  string value = 2;
+  string share = 3;
+}
+
+message ReportResponse {
+  string id = 1;
+  string portfolio_id = 2;
+  ReportType type = 3;
+  string period_start = 4;
+  string period_end = 5;
+  string currency = 6;
+  string start_value = 7;
+  string end_value = 8;
+  string purchases_amount = 9;
+  string sales_amount = 10;
+  string net_cash_flow = 11;
+  string profit = 12;
+  string yield_percent = 13;
+  repeated CategoryShareResponse structure = 14;
+  string generated_at = 15;
+}
+
+message ListReportsRequest {
+  string portfolio_id = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+}
+
+message ListReportsResponse {
+  repeated ReportResponse items = 1;
+  int32 total_count = 2;
+}
+
+message GetReportRequest {
+  string report_id = 1;
+}
+
+message GetPlatformStatsRequest {
+  string period_start = 1;
+  string period_end = 2;
+}
+
+message PlatformStatsResponse {
+  string period_start = 1;
+  string period_end = 2;
+  int32 investors_count = 3;
+  int32 portfolios_count = 4;
+  int32 trades_count = 5;
+  string trades_volume = 6;
+  string deposits_volume = 7;
+  string withdrawals_volume = 8;
+  string total_portfolio_value = 9;
+  repeated CategoryShareResponse structure = 10;
+}

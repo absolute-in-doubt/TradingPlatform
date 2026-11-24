@@ -1,0 +1,49 @@
+server:
+  port: 8080
+
+spring:
+  liquibase:
+    enabled: false
+  application:
+    name: getaway
+  graphql:
+    graphiql:
+      enabled: true
+      path: /graphiql
+    schema:
+      printer:
+        enabled: true
+  grpc:
+    client:
+      channel:
+        user-service:
+          address: 'static://localhost:9081'
+          target: 'static://localhost:9081'
+          negotiation-type: plaintext
+        asset-service:
+          address: 'static://localhost:9082'
+          target: 'static://localhost:9082'
+          negotiation-type: plaintext
+        portfolio-service:
+          address: 'static://localhost:9083'
+          target: 'static://localhost:9083'
+          negotiation-type: plaintext
+        trading-service:
+          address: 'static://localhost:9084'
+          target: 'static://localhost:9084'
+          negotiation-type: plaintext
+        payment-service:
+          address: 'static://localhost:9085'
+          target: 'static://localhost:9085'
+          negotiation-type: plaintext
+        analytics-service:
+          address: 'static://localhost:9086'
+          target: 'static://localhost:9086'
+          negotiation-type: plaintext
+        notification-service:
+          address: 'static://localhost:9087'
+          target: 'static://localhost:9087'
+          negotiation-type: plaintext
+
+jwt:
+  secret: c3VwZXItc2VjcmV0LWtleS1mb3Itand0LXRyYWRpbmctcGxhdGZvcm0tc2VjdXJpdHk=

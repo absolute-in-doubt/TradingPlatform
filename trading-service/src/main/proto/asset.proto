@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+package invest.asset.v1;
+
+option java_multiple_files = true;
+option java_package = "invest.asset.v1";
+
+service AssetService {
+  rpc GetAsset(GetAssetRequest) returns (GetAssetResponse);
+  rpc CreateAsset(CreateAssetRequest) returns (AssetResponse);
+  rpc UpdateAssetPrice(UpdateAssetPriceRequest) returns (AssetResponse);
+  rpc ListAssets(ListAssetsRequest) returns (ListAssetsResponse);
+  rpc GetAssetsByIds(GetAssetsByIdsRequest) returns (GetAssetsByIdsResponse);
+  rpc ListCategories(ListCategoriesRequest) returns (ListCategoriesResponse);
+}
+
+message GetAssetRequest {
+  string asset_id = 1;
+}
+
+message GetAssetResponse {
+  bool found = 1;
+  string asset_id = 2;
+  string ticker = 3;
+  string current_price = 4;
+  string currency = 5;
+  bool is_active = 6;
+  string name = 7;
+  string category_id = 8;
+  string category_name = 9;
+}
+
+message CreateAssetRequest {
+  string ticker = 1;
+  string name = 2;
+  string category_id = 3;
+  string initial_price = 4;
+  string currency = 5;
+}
+
+message UpdateAssetPriceRequest {
+  string asset_id = 1;
+  string new_price = 2;
+}
+
+message CategoryResponse {
+  string id = 1;
+  string code = 2;
+  string name = 3;
+  string description = 4;
+}
+
+message AssetResponse {
+  string id = 1;
+  string ticker = 2;
+  string name = 3;
+  CategoryResponse category = 4;
+  string current_price = 5;
+  string currency = 6;
+  bool is_active = 7;
+  string price_updated_at = 8;
+}
+
+enum AssetSortField {
+  SORT_TICKER = 0;
+  SORT_NAME = 1;
+  SORT_PRICE = 2;
+}
+
+enum SortDirection {
+  SORT_ASC = 0;
+  SORT_DESC = 1;
+}
+
+message ListAssetsRequest {
+  string category_id = 1;
+  string min_price = 2;
+  string max_price = 3;
+  string search = 4;
+  bool only_active = 5;
+  AssetSortField sort_field = 6;
+  SortDirection sort_direction = 7;
+  int32 limit = 8;
+  int32 offset = 9;
+}
+
+message ListAssetsResponse {
+  repeated AssetResponse items = 1;
+  int32 total_count = 2;
+}
+
+message GetAssetsByIdsRequest {
+  repeated string asset_ids = 1;
+}
+
+message GetAssetsByIdsResponse {
+  repeated AssetResponse items = 1;
+}
+
+message ListCategoriesRequest {}
+
+message ListCategoriesResponse {
+  repeated CategoryResponse categories = 1;
+}

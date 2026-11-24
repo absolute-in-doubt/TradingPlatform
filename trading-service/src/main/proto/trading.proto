@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package invest.trading.v1;
+
+option java_multiple_files = true;
+option java_package = "invest.trading.v1";
+
+service TradingService {
+  rpc RegisterTrade(RegisterTradeRequest) returns (TradeResponse);
+  rpc ListTrades(ListTradesRequest) returns (ListTradesResponse);
+}
+
+enum TradeType {
+  TRADE_TYPE_UNSPECIFIED = 0;
+  BUY = 1;
+  SELL = 2;
+}
+
+enum TradeStatus {
+  TRADE_STATUS_UNSPECIFIED = 0;
+  EXECUTED = 1;
+  REJECTED = 2;
+}
+
+message RegisterTradeRequest {
+  string portfolio_id = 1;
+  string investor_id = 2;
+  string broker_id = 3;
+  string asset_id = 4;
+  TradeType trade_type = 5;
+  string quantity = 6;
+}
+
+message TradeResponse {
+  string id = 1;
+  string portfolio_id = 2;
+  string investor_id = 3;
+  string broker_id = 4;
+  string asset_id = 5;
+  TradeType trade_type = 6;
+  string quantity = 7;
+  string price = 8;
+  string total_amount = 9;
+  string currency = 10;
+  TradeStatus status = 11;
+  string reject_reason = 12;
+  string executed_at = 13;
+}
+
+enum TradeSortField {
+  TRADE_SORT_DATE = 0;
+  TRADE_SORT_AMOUNT = 1;
+}
+
+enum SortDirection {
+  SORT_ASC = 0;
+  SORT_DESC = 1;
+}
+
+message ListTradesRequest {
+  string portfolio_id = 1;
+  string investor_id = 2;
+  string broker_id = 3;
+  string asset_id = 4;
+  TradeType trade_type = 5;
+  TradeStatus status = 6;
+  string date_from = 7;
+  string date_to = 8;
+  TradeSortField sort_field = 9;
+  SortDirection sort_direction = 10;
+  int32 limit = 11;
+  int32 offset = 12;
+}
+
+message ListTradesResponse {
+  repeated TradeResponse items = 1;
+  int32 total_count = 2;
+}

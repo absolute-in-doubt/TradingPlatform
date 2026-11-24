@@ -1,0 +1,395 @@
+scalar DateTime
+scalar Date
+scalar Decimal
+
+enum Role {
+    INVESTOR
+    BROKER
+    ADMIN
+}
+
+enum UserStatus {
+    ACTIVE
+    BLOCKED
+}
+
+enum RiskProfile {
+    CONSERVATIVE
+    MODERATE
+    AGGRESSIVE
+}
+
+enum TradeType {
+    BUY
+    SELL
+}
+
+enum TradeStatus {
+    EXECUTED
+    REJECTED
+}
+
+enum PaymentType {
+    DEPOSIT
+    WITHDRAWAL
+}
+
+enum PaymentStatus {
+    PROCESSED
+    REJECTED
+}
+
+enum ReportType {
+    ON_DEMAND
+    SCHEDULED
+}
+
+enum DeliveryStatus {
+    PENDING
+    SENT
+    FAILED
+}
+
+enum NotificationType {
+    TRADE_EXECUTED
+    PAYMENT_PROCESSED
+    ASSET_PRICE_CHANGE
+    PORTFOLIO_VALUE_CHANGE
+}
+
+enum SortDirection {
+    ASC
+    DESC
+}
+
+enum AssetSortField {
+    TICKER
+    NAME
+    PRICE
+}
+
+enum TradeSortField {
+    DATE
+    AMOUNT
+}
+
+enum PortfolioSortField {
+    NAME
+    VALUE
+    PROFIT_PERCENT
+}
+
+type User {
+    id: ID!
+    email: String!
+    fullName: String!
+    role: Role!
+    status: UserStatus!
+    registeredAt: DateTime!
+    investorProfile: InvestorProfile
+    brokerProfile: BrokerProfile
+}
+
+type InvestorProfile {
+    riskProfile: RiskProfile!
+    investingSince: Date!
+    broker: User
+}
+
+type BrokerProfile {
+    licenseNumber: String!
+    specialization: String
+}
+
+type AuthPayload {
+    accessToken: String!
+    expiresAt: DateTime!
+    user: User!
+}
+
+type AssetCategory {
+    id: ID!
+    name: String!
+    description: String
+}
+
+type Asset {
+    id: ID!
+    ticker: String!
+    name: String!
+    category: AssetCategory!
+    currentPrice: Decimal!
+    currency: String!
+    isActive: Boolean!
+    priceUpdatedAt: DateTime!
+}
+
+type Position {
+    asset: Asset!
+    quantity: Decimal!
+    avgPurchasePrice: Decimal!
+    currentPrice: Decimal!
+    marketValue: Decimal!
+    profit: Decimal!
+    profitPercent: Decimal!
+}
+
+type Portfolio {
+    id: ID!
+    name: String!
+    baseCurrency: String!
+    createdAt: DateTime!
+    positions: [Position!]!
+    totalValue: Decimal!
+    investedAmount: Decimal!
+    profit: Decimal!
+    profitPercent: Decimal!
+    cashBalance: Decimal!
+}
+
+type Trade {
+    id: ID!
+    portfolio: Portfolio
+    asset: Asset!
+    broker: User
+    type: TradeType!
+    quantity: Decimal!
+    price: Decimal!
+    totalAmount: Decimal!
+    currency: String!
+    status: TradeStatus!
+    rejectReason: String
+    createdAt: DateTime!
+}
+
+type PaymentOperation {
+    id: ID!
+    type: PaymentType!
+    amount: Decimal!
+    currency: String!
+    status: PaymentStatus!
+    rejectReason: String
+    createdAt: DateTime!
+}
+
+type CategoryShare {
+    category: String!
+    value: Decimal!
+    share: Decimal!
+}
+
+type PortfolioPerformance {
+    portfolioId: ID!
+    periodStart: Date!
+    periodEnd: Date!
+    currency: String!
+    startValue: Decimal!
+    endValue: Decimal!
+    purchasesAmount: Decimal!
+    salesAmount: Decimal!
+    profit: Decimal!
+    yieldPercent: Decimal!
+}
+
+type Report {
+    id: ID!
+    portfolioId: ID!
+    type: ReportType!
+    periodStart: Date!
+    periodEnd: Date!
+    currency: String!
+    startValue: Decimal!
+    endValue: Decimal!
+    purchasesAmount: Decimal!
+    salesAmount: Decimal!
+    netCashFlow: Decimal!
+    profit: Decimal!
+    yieldPercent: Decimal!
+    structure: [CategoryShare!]!
+    generatedAt: DateTime!
+}
+
+type Notification {
+    id: ID!
+    type: NotificationType!
+    message: String!
+    deliveryStatus: DeliveryStatus!
+    isRead: Boolean!
+    readAt: DateTime
+    createdAt: DateTime!
+}
+
+type PlatformStats {
+    periodStart: Date!
+    periodEnd: Date!
+    investorsCount: Int!
+    portfoliosCount: Int!
+    tradesCount: Int!
+    tradesVolume: Decimal!
+    depositsVolume: Decimal!
+    withdrawalsVolume: Decimal!
+    totalPortfolioValue: Decimal!
+    structure: [CategoryShare!]!
+}
+
+type AssetPage {
+    items: [Asset!]!
+    totalCount: Int!
+}
+
+type TradePage {
+    items: [Trade!]!
+    totalCount: Int!
+}
+
+type PaymentPage {
+    items: [PaymentOperation!]!
+    totalCount: Int!
+}
+
+type ReportPage {
+    items: [Report!]!
+    totalCount: Int!
+}
+
+type NotificationPage {
+    items: [Notification!]!
+    totalCount: Int!
+}
+
+input PageInput {
+    limit: Int = 20
+    offset: Int = 0
+}
+
+input RegisterUserInput {
+    email: String!
+    password: String!
+    fullName: String!
+    role: Role!
+    riskProfile: RiskProfile
+    brokerId: ID
+    licenseNumber: String
+    specialization: String
+}
+
+input LoginInput {
+    email: String!
+    password: String!
+}
+
+input CreatePortfolioInput {
+    name: String!
+    baseCurrency: String!
+}
+
+input CreateAssetInput {
+    ticker: String!
+    name: String!
+    categoryId: ID!
+    initialPrice: Decimal!
+    currency: String!
+}
+
+input UpdateAssetPriceInput {
+    assetId: ID!
+    newPrice: Decimal!
+}
+
+input TradeInput {
+    portfolioId: ID!
+    assetId: ID!
+    quantity: Decimal!
+}
+
+input PaymentInput {
+    amount: Decimal!
+    currency: String!
+}
+
+input GenerateReportInput {
+    portfolioId: ID!
+    periodStart: Date!
+    periodEnd: Date!
+}
+
+input AssetFilter {
+    categoryId: ID
+    minPrice: Decimal
+    maxPrice: Decimal
+    search: String
+    onlyActive: Boolean = true
+}
+
+input AssetSort {
+    field: AssetSortField = TICKER
+    direction: SortDirection = ASC
+}
+
+input TradeFilter {
+    portfolioId: ID
+    investorId: ID
+    assetId: ID
+    type: TradeType
+    status: TradeStatus
+    dateFrom: DateTime
+    dateTo: DateTime
+}
+
+input TradeSort {
+    field: TradeSortField = DATE
+    direction: SortDirection = DESC
+}
+
+input PaymentFilter {
+    type: PaymentType
+    dateFrom: DateTime
+    dateTo: DateTime
+}
+
+input PortfolioSort {
+    field: PortfolioSortField = NAME
+    direction: SortDirection = ASC
+}
+
+type Query {
+    me: User!
+    brokerInvestors: [User!]!
+
+    assetCategories: [AssetCategory!]!
+    assets(filter: AssetFilter, sort: AssetSort, page: PageInput): AssetPage!
+    asset(id: ID!): Asset
+
+    myPortfolios(sort: PortfolioSort): [Portfolio!]!
+    portfolio(id: ID!): Portfolio
+    portfolioPerformance(portfolioId: ID!, periodStart: Date!, periodEnd: Date!): PortfolioPerformance!
+
+    trades(filter: TradeFilter, sort: TradeSort, page: PageInput): TradePage!
+    payments(filter: PaymentFilter, page: PageInput): PaymentPage!
+
+    reports(portfolioId: ID!, page: PageInput): ReportPage!
+    report(id: ID!): Report
+    platformStats(periodStart: Date!, periodEnd: Date!): PlatformStats!
+
+    notifications(unreadOnly: Boolean = false, page: PageInput): NotificationPage!
+    unreadNotificationsCount: Int!
+}
+
+type Mutation {
+    registerUser(input: RegisterUserInput!): AuthPayload!
+    login(input: LoginInput!): AuthPayload!
+
+    createPortfolio(input: CreatePortfolioInput!): Portfolio!
+    createAsset(input: CreateAssetInput!): Asset!
+    updateAssetPrice(input: UpdateAssetPriceInput!): Asset!
+
+    buyAsset(input: TradeInput!): Trade!
+    sellAsset(input: TradeInput!): Trade!
+
+    depositFunds(input: PaymentInput!): PaymentOperation!
+    withdrawFunds(input: PaymentInput!): PaymentOperation!
+
+    generateReport(input: GenerateReportInput!): Report!
+    markNotificationRead(id: ID!): Notification!
+    markAllNotificationsRead: Int!
+}

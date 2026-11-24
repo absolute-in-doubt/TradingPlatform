@@ -1,0 +1,101 @@
+syntax = "proto3";
+
+package invest.user.v1;
+
+option java_multiple_files = true;
+option java_package = "invest.user.v1";
+
+service UserService {
+  rpc GetInvestor(GetInvestorRequest) returns (GetInvestorResponse);
+  rpc Register(RegisterRequest) returns (AuthResponse);
+  rpc Login(LoginRequest) returns (AuthResponse);
+  rpc GetUser(GetUserRequest) returns (UserResponse);
+  rpc ListBrokerInvestors(ListBrokerInvestorsRequest) returns (ListBrokerInvestorsResponse);
+}
+
+enum UserStatus {
+  USER_STATUS_UNSPECIFIED = 0;
+  USER_STATUS_ACTIVE = 1;
+  USER_STATUS_BLOCKED = 2;
+}
+
+enum Role {
+  ROLE_UNSPECIFIED = 0;
+  INVESTOR = 1;
+  BROKER = 2;
+  ADMIN = 3;
+}
+
+enum RiskProfile {
+  RISK_PROFILE_UNSPECIFIED = 0;
+  CONSERVATIVE = 1;
+  MODERATE = 2;
+  AGGRESSIVE = 3;
+}
+
+message GetInvestorRequest {
+  string investor_id = 1;
+}
+
+message GetInvestorResponse {
+  bool found = 1;
+  UserStatus status = 2;
+  string broker_id = 3;
+}
+
+message RegisterRequest {
+  string email = 1;
+  string password = 2;
+  string full_name = 3;
+  Role role = 4;
+  RiskProfile risk_profile = 5;
+  string broker_id = 6;
+  string license_number = 7;
+  string specialization = 8;
+  string phone = 9;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message AuthResponse {
+  string access_token = 1;
+  string expires_at = 2;
+  UserResponse user = 3;
+}
+
+message GetUserRequest {
+  string user_id = 1;
+}
+
+message InvestorProfileResponse {
+  RiskProfile risk_profile = 1;
+  string investing_since = 2;
+  UserResponse broker = 3;
+}
+
+message BrokerProfileResponse {
+  string license_number = 1;
+  string specialization = 2;
+}
+
+message UserResponse {
+  string id = 1;
+  string email = 2;
+  string full_name = 3;
+  Role role = 4;
+  UserStatus status = 5;
+  string registered_at = 6;
+  InvestorProfileResponse investor_profile = 7;
+  BrokerProfileResponse broker_profile = 8;
+}
+
+message ListBrokerInvestorsRequest {
+  string broker_id = 1;
+}
+
+message ListBrokerInvestorsResponse {
+  repeated UserResponse investors = 1;
+}

@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package invest.payment.v1;
+
+option java_multiple_files = true;
+option java_package = "invest.payment.v1";
+
+service PaymentService {
+  rpc RegisterPayment(RegisterPaymentRequest) returns (PaymentResponse);
+  rpc ListPayments(ListPaymentsRequest) returns (ListPaymentsResponse);
+}
+
+enum PaymentType {
+  PAYMENT_TYPE_UNSPECIFIED = 0;
+  DEPOSIT = 1;
+  WITHDRAWAL = 2;
+}
+
+enum PaymentStatus {
+  PAYMENT_STATUS_UNSPECIFIED = 0;
+  PROCESSED = 1;
+  REJECTED = 2;
+}
+
+message RegisterPaymentRequest {
+  string investor_id = 1;
+  PaymentType type = 2;
+  string amount = 3;
+  string currency = 4;
+}
+
+message PaymentResponse {
+  string id = 1;
+  string investor_id = 2;
+  PaymentType type = 3;
+  string amount = 4;
+  string currency = 5;
+  PaymentStatus status = 6;
+  string reject_reason = 7;
+  string payment_method = 8;
+  string processed_at = 9;
+}
+
+message ListPaymentsRequest {
+  string investor_id = 1;
+  PaymentType type = 2;
+  string date_from = 3;
+  string date_to = 4;
+  int32 limit = 5;
+  int32 offset = 6;
+}
+
+message ListPaymentsResponse {
+  repeated PaymentResponse items = 1;
+  int32 total_count = 2;
+}

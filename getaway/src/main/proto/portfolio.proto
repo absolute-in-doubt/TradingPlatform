@@ -1,0 +1,143 @@
+syntax = "proto3";
+
+package invest.portfolio.v1;
+
+option java_multiple_files = true;
+option java_package = "invest.portfolio.v1";
+
+service PortfolioService {
+  rpc ValidateTrade(ValidateTradeRequest) returns (ValidateTradeResponse);
+  rpc CheckFunds(CheckFundsRequest) returns (CheckFundsResponse);
+  rpc GetPortfolioSnapshot(SnapshotRequest) returns (SnapshotResponse);
+  rpc GetAssetHolders(AssetHoldersRequest) returns (AssetHoldersResponse);
+  rpc CreatePortfolio(CreatePortfolioRequest) returns (PortfolioResponse);
+  rpc ListPortfolios(ListPortfoliosRequest) returns (ListPortfoliosResponse);
+  rpc GetPortfolio(GetPortfolioRequest) returns (PortfolioResponse);
+}
+
+enum TradeType {
+  TRADE_TYPE_UNSPECIFIED = 0;
+  TRADE_TYPE_BUY = 1;
+  TRADE_TYPE_SELL = 2;
+}
+
+enum RejectCode {
+  REJECT_CODE_NONE = 0;
+  PORTFOLIO_NOT_FOUND = 1;
+  CURRENCY_MISMATCH = 2;
+  INSUFFICIENT_FUNDS = 3;
+  INSUFFICIENT_POSITION = 4;
+}
+
+message ValidateTradeRequest {
+  string portfolio_id = 1;
+  string investor_id = 2;
+  string asset_id = 3;
+  TradeType trade_type = 4;
+  string quantity = 5;
+  string total_amount = 6;
+  string currency = 7;
+}
+
+message ValidateTradeResponse {
+  bool valid = 1;
+  RejectCode reject_code = 2;
+  string available_quantity = 3;
+  string available_funds = 4;
+}
+
+message CheckFundsRequest {
+  string investor_id = 1;
+  string currency = 2;
+  string amount = 3;
+}
+
+message CheckFundsResponse {
+  bool sufficient = 1;
+  string available_amount = 2;
+}
+
+message SnapshotRequest {
+  string portfolio_id = 1;
+}
+
+message PositionSnapshot {
+  string asset_id = 1;
+  string quantity = 2;
+  string avg_purchase_price = 3;
+  string current_price = 4;
+  string market_value = 5;
+}
+
+message SnapshotResponse {
+  bool found = 1;
+  string investor_id = 2;
+  string base_currency = 3;
+  repeated PositionSnapshot positions = 4;
+  string total_value = 5;
+  string cash_balance = 6;
+  string calculated_at = 7;
+}
+
+message AssetHoldersRequest {
+  string asset_id = 1;
+}
+
+message AssetHoldersResponse {
+  repeated string investor_ids = 1;
+}
+
+message CreatePortfolioRequest {
+  string investor_id = 1;
+  string name = 2;
+  string base_currency = 3;
+}
+
+message PositionResponse {
+  string asset_id = 1;
+  string quantity = 2;
+  string avg_purchase_price = 3;
+  string current_price = 4;
+  string market_value = 5;
+  string profit = 6;
+  string profit_percent = 7;
+}
+
+message PortfolioResponse {
+  string id = 1;
+  string investor_id = 2;
+  string name = 3;
+  string base_currency = 4;
+  string created_at = 5;
+  repeated PositionResponse positions = 6;
+  string total_value = 7;
+  string invested_amount = 8;
+  string profit = 9;
+  string profit_percent = 10;
+  string cash_balance = 11;
+}
+
+enum PortfolioSortField {
+  PORTFOLIO_SORT_NAME = 0;
+  PORTFOLIO_SORT_VALUE = 1;
+  PORTFOLIO_SORT_PROFIT_PERCENT = 2;
+}
+
+enum PortfolioSortDirection {
+  PORTFOLIO_ASC = 0;
+  PORTFOLIO_DESC = 1;
+}
+
+message ListPortfoliosRequest {
+  string investor_id = 1;
+  PortfolioSortField sort_field = 2;
+  PortfolioSortDirection sort_direction = 3;
+}
+
+message ListPortfoliosResponse {
+  repeated PortfolioResponse portfolios = 1;
+}
+
+message GetPortfolioRequest {
+  string portfolio_id = 1;
+}
